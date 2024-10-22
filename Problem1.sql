@@ -2,55 +2,54 @@
 -- PROBLEM ONE: UNIVERSITY ENROLLMENT --
 --************************************--
 
--- By: William Moss--
---  10-13-2024   --
+-- Created by: William Moss --
+-- Date: 10-13-2024 --
 
-----------------------------------------`
---    TABLE CREATION                  --
+----------------------------------------
+--    SETTING UP THE DATABASE          --
 ----------------------------------------
 
--- STUDENTS TABLE --
+-- First, let's create a table for our students.
 CREATE TABLE IF NOT EXISTS students (
-    id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    enrollment_date DATE NOT NULL
+    id SERIAL PRIMARY KEY,              -- Each student gets a unique ID
+    first_name VARCHAR(50) NOT NULL,   -- Student's first name
+    last_name VARCHAR(50) NOT NULL,    -- Student's last name
+    email VARCHAR(100) UNIQUE NOT NULL, -- Unique email for each student
+    enrollment_date DATE NOT NULL       -- The date they enrolled
 );
 
--- PROFESSORS TABLE --
+-- Now, let's create a table for our professors.
 CREATE TABLE IF NOT EXISTS professors (
-    id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    department VARCHAR(100) NOT NULL
+    id SERIAL PRIMARY KEY,              -- Each professor gets a unique ID
+    first_name VARCHAR(50) NOT NULL,   -- Professor's first name
+    last_name VARCHAR(50) NOT NULL,    -- Professor's last name
+    department VARCHAR(100) NOT NULL    -- Department they belong to
 );
 
--- COURSES TABLE --
+-- Next up, we need a table for the courses offered.
 CREATE TABLE IF NOT EXISTS courses (
-    id SERIAL PRIMARY KEY,
-    course_name VARCHAR(100) NOT NULL,
-    course_description TEXT NOT NULL,
-    professor_id INTEGER NOT NULL,
-	FOREIGN KEY (professor_id) REFERENCES professors(id)
+    id SERIAL PRIMARY KEY,              -- Each course gets a unique ID
+    course_name VARCHAR(100) NOT NULL,  -- Name of the course
+    course_description TEXT NOT NULL,   -- Description of the course
+    professor_id INTEGER NOT NULL,      -- Which professor teaches this course
+    FOREIGN KEY (professor_id) REFERENCES professors(id) -- Links to the professors table
 );
 
--- ENROLLMENTS TABLE --
+-- Finally, let’s create a table to track enrollments.
 CREATE TABLE IF NOT EXISTS enrollments (
-    student_id INTEGER NOT NULL,
-    course_id INTEGER NOT NULL,
-    enrollment_date DATE NOT NULL,
-    PRIMARY KEY (student_id, course_id),
-    FOREIGN KEY (student_id) REFERENCES students(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    student_id INTEGER NOT NULL,        -- Links to the student
+    course_id INTEGER NOT NULL,         -- Links to the course
+    enrollment_date DATE NOT NULL,      -- When the student enrolled
+    PRIMARY KEY (student_id, course_id), -- Each student can only enroll in a course once
+    FOREIGN KEY (student_id) REFERENCES students(id), -- Links to students table
+    FOREIGN KEY (course_id) REFERENCES courses(id) -- Links to courses table
 );
 
 ----------------------------------------
---    ADD INFO TO SCRIPT              --
+--    ADDING DATA TO THE DATABASE     --
 ----------------------------------------
 
-
--- INSERT data into the STUDENTS table
+-- Let's add some students to our students table.
 INSERT INTO students (first_name, last_name, email, enrollment_date) VALUES
 ('Duke', 'Nukem', 'Duke.Nukem@universitymail.com', '2024-02-04'),
 ('Alex', 'Ample', 'Alex.Ample@universitymail.com', '2024-04-03'),
@@ -58,36 +57,30 @@ INSERT INTO students (first_name, last_name, email, enrollment_date) VALUES
 ('Barry', 'Mealive', 'Barry.Mealive@universitymail.com', '2024-07-24'),
 ('Ida', 'Student', 'Ida.Student@universitymail.com', '2024-09-01');
 
--- Confirmation query for students
+-- Let’s see if our students were added successfully.
 SELECT * FROM students;
 
-
--- INSERT information into the PROFESSORS table
+-- Now, let's add some professors.
 INSERT INTO professors (first_name, last_name, department) VALUES
 ('Khan', 'Pewter', 'Computer Science'),
 ('Heisen', 'Burg', 'Chemistry'),
 ('Jenny', 'Talia', 'Body Anatomy'),
 ('Frasier', 'Wordswright', 'English Literature');
 
--- Confirmation query for professors
+-- Confirming that professors were added.
 SELECT * FROM professors;
 
-
--- INSERT data into the COURSES table
--- Professor IDs are sequential(Serial); 1 for Khan, 2 Heisen, etc
+-- Next, we’ll add some courses.
 INSERT INTO courses (course_name, course_description, professor_id) VALUES
 ('Introduction to Computer Science', 'Fundamentals of SQL and pgAdmin4.', 1),
 ('Chemistry 101', 'Basics of Cold Fusion.', 2),
 ('Meta-Body Anatomy', 'How to Grow Extra Limbs.', 3),
-('English And Its Derivates', 'Words; The Discourse', 4);
+('English And Its Derivatives', 'Words; The Discourse', 4);
 
-
--- Confirmation query for courses
+-- Let’s check our courses.
 SELECT * FROM courses;
 
-
--- INSERT data into the ENROLLMENTS table
--- Student IDs and Course IDs start from 1 and increment by 1(Serial)
+-- Now we’ll enroll some students in these courses.
 INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
 (1, 1, '2024-02-04'),  -- Duke Nukem enrolls in Introduction to Computer Science
 (1, 2, '2024-02-04'),  -- Duke Nukem enrolls in Chemistry 101
@@ -95,12 +88,11 @@ INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
 (3, 3, '2024-07-15'),  -- Noah Scuses enrolls in Meta-Body Anatomy
 (4, 2, '2024-07-24');  -- Barry Mealive enrolls in Chemistry 101
 
--- BONUS: INSERT Ida Studen in English And Its Derivatives
+-- Bonus: Let's get Ida Student enrolled in a course.
 INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
 (5, 4, '2024-09-01');
 
-
--- Confirmation query for enrollments
+-- Check to see all enrollments.
 SELECT 
     e.student_id,
     s.first_name || ' ' || s.last_name AS student_name,
@@ -114,14 +106,11 @@ JOIN
 JOIN 
     courses c ON e.course_id = c.id;
 
-
 ----------------------------------------
---    ASSIGNED QUERIES                --
+--    QUERYING THE DATABASE            --
 ----------------------------------------
 
--- 1. Retrieve Full Names of Students Enrolled in "Chemistry 101"
--- Using Chemistry instead of Physics as this is a fictional scenario and I already have my courses created. 
-
+-- 1. Who's enrolled in "Chemistry 101"? Let's find out!
 SELECT
     s.first_name || ' ' || s.last_name AS full_name
 FROM
@@ -135,8 +124,7 @@ WHERE
 
 ----------------------------------------
 
--- 2. Retrieve Courses with Professor's Full Names
-
+-- 2. Let's see which professors teach which courses.
 SELECT
     c.course_name,
     p.first_name || ' ' || p.last_name AS professor_full_name
@@ -147,8 +135,7 @@ JOIN
 
 ----------------------------------------
 
--- 3. Retrieve Courses with Enrolled Students
-
+-- 3. What courses have students enrolled?
 SELECT DISTINCT
     c.course_name
 FROM
@@ -156,36 +143,33 @@ FROM
 JOIN
     enrollments e ON c.id = e.course_id;
 
-
 ----------------------------------------
---    Updating Data                   --
+--    UPDATING INFORMATION              --
 ----------------------------------------
 
--- 1. Identify the Student by id
+-- 1. Let’s look at a specific student by their ID.
 SELECT * FROM students WHERE id = 2;
 
--- Alternatively, identify by name
+-- You could also look them up by name if you prefer.
 -- SELECT * FROM students WHERE first_name = 'Alex' AND last_name = 'Ample';
 
 ----------------------------------------
 
--- 2. Update the Student's Email
+-- 2. Time to update Alex's email.
 UPDATE students
 SET email = 'Alex.Ample@updatemail.com'
 WHERE id = 2;
 
 ----------------------------------------
 
--- 3. Verify the Update
+-- 3. Let’s check if the email update worked.
 SELECT * FROM students WHERE id = 2;
 
 ----------------------------------------
---    Deleting Data                   --
+--    DELETING INFORMATION              --
 ----------------------------------------
 
--- 1. Identify the Enrollment Record
-
--- Retrieve the enrollment record for Duke Nukem in Chemistry 101
+-- 1. Let’s confirm the enrollment record for Duke in Chemistry 101.
 SELECT
     e.student_id,
     s.first_name || ' ' || s.last_name AS student_name,
@@ -203,16 +187,13 @@ WHERE
 
 ----------------------------------------
 
--- 2. Delete the Enrollment Record
-
+-- 2. Now let's delete Duke's enrollment in Chemistry 101.
 DELETE FROM enrollments
 WHERE student_id = 1 AND course_id = 2;
 
 ----------------------------------------
 
--- 3. Verify the Deletion
-
--- Attempt to retrieve the deleted enrollment record
+-- 3. Let’s check to see if Duke's enrollment was successfully deleted.
 SELECT
     e.student_id,
     s.first_name || ' ' || s.last_name AS student_name,
@@ -228,7 +209,7 @@ JOIN
 WHERE
     e.student_id = 1 AND e.course_id = 2;
 
--- View all remaining enrollments
+-- And let’s view all the remaining enrollments.
 SELECT
     e.student_id,
     s.first_name || ' ' || s.last_name AS student_name,
